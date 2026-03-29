@@ -1,8 +1,10 @@
+<!-- Horae 主抽屉面板 -->
 <div id="horae_drawer" class="drawer">
     <div class="drawer-toggle">
         <div id="horae_drawer_icon" class="drawer-icon fa-regular fa-clock fa-fw closedIcon interactable" title="Horae - Ký ức Thời gian" tabindex="0"></div>
     </div>
     <div id="horae_drawer_content" class="drawer-content closedDrawer">
+        <!-- 头部 -->
         <div class="drawer-header">
             <div class="horae-title">
                 <i class="fa-regular fa-clock"></i>
@@ -11,6 +13,7 @@
             <span class="horae-version">v1.10.1</span>
         </div>
         
+        <!-- 标签页导航 -->
         <div class="horae-tabs">
             <button class="horae-tab active" data-tab="status">
                 <i class="fa-solid fa-gauge"></i>
@@ -41,8 +44,10 @@
                 <span> Cài đặt </span>
             </button>
         </div>
-        
+
+        <!-- 标签页内容 -->
         <div class="horae-tab-contents">
+            <!-- 状态页 -->
             <div id="horae-tab-status" class="horae-tab-content active">
                 <div class="horae-state-section">
                     <div class="horae-section-header">
@@ -93,8 +98,10 @@
                     </button>
                 </div>
             </div>
-            
+
+            <!-- 时间线页 -->
             <div id="horae-tab-timeline" class="horae-tab-content">
+                <!-- 待办事项区域 -->
                 <div class="horae-agenda-section">
                     <div class="horae-agenda-header">
                         <span><i class="fa-solid fa-list-check"></i> Việc cần làm </span>
@@ -102,6 +109,7 @@
                             <i class="fa-solid fa-plus"></i>
                         </button>
                     </div>
+                    <!-- 待办多选模式工具栏 -->
                     <div id="horae-agenda-multiselect-bar" class="horae-multiselect-bar" style="display: none;">
                         <div class="horae-multiselect-info">
                             <span id="horae-agenda-selected-count">0</span> Mục đã chọn
@@ -122,7 +130,8 @@
                         <div class="horae-empty-hint">Tạm thời không có việc cần làm</div>
                     </div>
                 </div>
-                
+
+                <!-- 事件时间线区域 -->
                 <div class="horae-timeline-header">
                     <span> Dòng thời gian sự kiện </span>
                     <div class="horae-timeline-controls">
@@ -148,6 +157,7 @@
                     <i class="fa-solid fa-magnifying-glass horae-search-icon"></i>
                     <input type="text" id="horae-timeline-search" class="horae-search-input" placeholder="Tìm kiếm từ khóa sự kiện...">
                 </div>
+                <!-- 时间线多选模式工具栏 -->
                 <div id="horae-timeline-multiselect-bar" class="horae-multiselect-bar" style="display: none;">
                     <div class="horae-multiselect-info">
                         <span id="horae-timeline-selected-count">0</span> Mục đã chọn
@@ -174,7 +184,8 @@
                     </div>
                 </div>
             </div>
-            
+
+            <!-- 角色页 -->
             <div id="horae-tab-characters" class="horae-tab-content">
                 <div class="horae-subsection">
                     <div class="horae-subsection-title">Nhân vật có mặt</div>
@@ -235,7 +246,8 @@
                     </div>
                 </div>
             </div>
-            
+
+            <!-- 物品页 -->
             <div id="horae-tab-items" class="horae-tab-content">
                 <div class="horae-items-toolbar">
                     <div class="horae-items-header">
@@ -260,6 +272,7 @@
                         <input type="text" id="horae-items-search" class="horae-search-input" placeholder="Tìm kiếm tên vật phẩm, người nắm giữ, vị trí...">
                     </div>
                 </div>
+                <!-- 多选模式工具栏 -->
                 <div id="horae-items-multiselect-bar" class="horae-multiselect-bar" style="display: none;">
                     <div class="horae-multiselect-info">
                         <span id="horae-items-selected-count">0</span> Mục đã chọn
@@ -286,7 +299,8 @@
                     </div>
                 </div>
             </div>
-            
+
+            <!-- 场景记忆页 -->
             <div id="horae-tab-locations" class="horae-tab-content">
                 <div class="horae-location-toolbar">
                     <button id="horae-btn-add-location" class="horae-btn" title="Thêm địa điểm thủ công">
@@ -305,7 +319,9 @@
                 </div>
             </div>
 
+            <!-- RPG 页 -->
             <div id="horae-tab-rpg" class="horae-tab-content">
+                <!-- 属性条配置 -->
                 <div class="horae-rpg-config-section" id="horae-rpg-bar-config-area">
                     <div class="horae-rpg-section-head">
                         <span> Cấu hình thanh thuộc tính </span>
@@ -318,6 +334,7 @@
                     <div id="horae-rpg-bar-config-list"></div>
                     <input type="file" id="horae-rpg-bar-import-file" accept=".json" style="display:none;" />
                 </div>
+                <!-- 属性面板配置 -->
                 <div class="horae-rpg-config-section" id="horae-rpg-attr-config-area">
                     <div class="horae-rpg-section-head">
                         <span> Cấu hình bảng thuộc tính </span>
@@ -330,8 +347,11 @@
                     <div id="horae-rpg-attr-config-list"></div>
                     <input type="file" id="horae-rpg-attr-import-file" accept=".json" style="display:none;" />
                 </div>
+                <!-- 在场角色属性条 -->
                 <div id="horae-rpg-bars-section"></div>
+                <!-- 角色卡片区（角色卡折叠模式） -->
                 <div id="horae-rpg-char-cards"></div>
+                <!-- 角色属性手动编辑 -->
                 <div class="horae-rpg-manual-section">
                     <div class="horae-rpg-section-head">
                         <span> Thuộc tính nhân vật </span>
@@ -339,6 +359,7 @@
                     </div>
                     <div id="horae-rpg-charattr-form" style="display:none;"></div>
                 </div>
+                <!-- 技能列表 -->
                 <div class="horae-rpg-skills-area">
                     <div class="horae-rpg-section-head">
                         <span> Danh sách kỹ năng </span>
@@ -347,6 +368,7 @@
                     <div id="horae-rpg-skill-form" style="display:none;"></div>
                     <div id="horae-rpg-skills-section"></div>
                 </div>
+                <!-- 装备栏 -->
                 <div class="horae-rpg-equipment-area" id="horae-rpg-equipment-area" style="display:none;">
                     <div class="horae-rpg-section-head">
                         <span> Trang bị </span>
@@ -358,6 +380,7 @@
                     <input type="file" id="horae-rpg-eq-import-file" accept=".json" style="display:none;" />
                     <div id="horae-rpg-eq-values-section"></div>
                 </div>
+                <!-- 声望系统 -->
                 <div class="horae-rpg-reputation-area" id="horae-rpg-reputation-area" style="display:none;">
                     <div class="horae-rpg-section-head">
                         <span> Cấu hình danh tiếng </span>
@@ -369,12 +392,14 @@
                     <div id="horae-rpg-rep-config-list"></div>
                     <div id="horae-rpg-rep-values-section"></div>
                 </div>
+                <!-- 等级系统 -->
                 <div class="horae-rpg-level-area" id="horae-rpg-level-area" style="display:none;">
                     <div class="horae-rpg-section-head">
                         <span> Cấp độ / Điểm kinh nghiệm </span>
                     </div>
                     <div id="horae-rpg-level-values-section"></div>
                 </div>
+                <!-- 货币系统 -->
                 <div class="horae-rpg-currency-area" id="horae-rpg-currency-area" style="display:none;">
                     <div class="horae-rpg-section-head">
                         <span> Cấu hình tiền tệ </span>
@@ -386,6 +411,7 @@
                     <div id="horae-rpg-cur-denom-list"></div>
                     <div id="horae-rpg-cur-values-section"></div>
                 </div>
+                <!-- 据点系统 -->
                 <div class="horae-rpg-stronghold-area" id="horae-rpg-stronghold-area" style="display:none;">
                     <div class="horae-rpg-section-head">
                         <span> Cứ điểm / Căn cứ </span>
@@ -397,7 +423,8 @@
                     <div id="horae-rpg-sh-tree"></div>
                 </div>
             </div>
-            
+
+            <!-- 设置页 -->
             <div id="horae-tab-settings" class="horae-tab-content">
                 <div class="horae-settings-section" style="margin-bottom:12px;">
                     <div class="horae-section-header">
@@ -572,7 +599,8 @@
                     </span>
                     
                     <div id="horae-custom-tables-list" class="horae-custom-tables-list">
-                        </div>
+                        <!-- 动态生成（每个表格自带撤回/复原按钮） -->
+                    </div>
                     
                     <div class="horae-table-buttons">
                         <button id="horae-btn-add-table-local" class="horae-btn-add-table">
