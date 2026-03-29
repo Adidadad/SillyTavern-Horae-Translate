@@ -6,35 +6,35 @@ const WEEKDAY_NAMES = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Th
 /** Tên các mùa */
 const SEASONS = ['Mùa đông', 'Mùa đông', 'Mùa xuân', 'Mùa xuân', 'Mùa xuân', 'Mùa hè', 'Mùa hè', 'Mùa hè', 'Mùa thu', 'Mùa thu', 'Mùa thu', 'Mùa đông'];
 
-/** Ánh xạ số tiếng Trung (Giữ nguyên khóa để phân tích cú pháp) */
+/** Ánh xạ số tiếng Việt */
 const CHINESE_NUMS = {
-    '零': 0, '〇': 0,
-    '一': 1, '二': 2, '三': 3, '四': 4, '五': 5,
-    '六': 6, '七': 7, '八': 8, '九': 9, '十': 10,
-    '十一': 11, '十二': 12, '十三': 13, '十四': 14, '十五': 15,
-    '十六': 16, '十七': 17, '十八': 18, '十九': 19, '二十': 20,
-    '廿': 20, '廿一': 21, '廿二': 22, '廿三': 23, '廿四': 24, '廿五': 25,
-    '廿六': 26, '廿七': 27, '廿八': 28, '廿九': 29, '三十': 30,
-    '三十一': 31, '卅': 30, '卅一': 31
+    'không': 0,
+    'một': 1, 'hai': 2, 'ba': 3, 'bốn': 4, 'năm': 5,
+    'sáu': 6, 'bảy': 7, 'tám': 8, 'chín': 9, 'mười': 10,
+    'mười một': 11, 'mười hai': 12, 'mười ba': 13, 'mười bốn': 14, 'mười lăm': 15,
+    'mười sáu': 16, 'mười bảy': 17, 'mười tám': 18, 'mười chín': 19, 'hai mươi': 20,
+    'hai mươi mốt': 21, 'hai mươi hai': 22, 'hai mươi ba': 23, 'hai mươi tư': 24, 'hai mươi lăm': 25,
+    'hai mươi sáu': 26, 'hai mươi bảy': 27, 'hai mươi tám': 28, 'hai mươi chín': 29, 'ba mươi': 30,
+    'ba mươi mốt': 31
 };
 
 /** Trích xuất số ngày từ chuỗi ngày tháng */
 function extractDayNumber(dateStr) {
     if (!dateStr) return null;
     
-    const arabicMatch = dateStr.match(/(?:第|Day\s*|day\s*)(\d+)(?:日)?/i) ||
-                       dateStr.match(/(\d+)(?:日|号)/);
+    const arabicMatch = dateStr.match(/(?:Ngày thứ|Ngày|Day\s*|day\s*)(\d+)(?: ngày)?/i) ||
+                       dateStr.match(/(\d+)(?: ngày|)/i);
     if (arabicMatch) return parseInt(arabicMatch[1]);
     
-    // Khớp số tiếng Trung
+    // Khớp số tiếng Việt
     const sortedEntries = Object.entries(CHINESE_NUMS).sort((a, b) => b[0].length - a[0].length);
     
     for (const [cn, num] of sortedEntries) {
         const patterns = [
-            new RegExp(`第${cn}日`),
-            new RegExp(`第${cn}(?![\u4e00-\u9fa5])`),  // Chữ 'Thứ X' phía sau không theo sau bởi chữ Hán
-            new RegExp(`[月]${cn}日`),
-            new RegExp(`${cn}日`)
+            new RegExp(`Ngày thứ ${cn}`, 'i'),
+            new RegExp(`Ngày thứ ${cn}(?![a-zA-Zà-ỹÀ-Ỹ])`, 'i'),  // Ngày thứ X không theo sau bởi chữ cái
+            new RegExp(`tháng ${cn} ngày`, 'i'),
+            new RegExp(`ngày ${cn}`, 'i')
         ];
         
         for (const pattern of patterns) {
@@ -55,11 +55,11 @@ function extractMonthIdentifier(dateStr) {
     if (!dateStr) return null;
     
     // Khớp định dạng "Tháng X"
-    const monthMatch = dateStr.match(/([^\s\d]+月)/);
+    const monthMatch = dateStr.match(/([^\s\d]+ tháng)/i) || dateStr.match(/(Tháng [^\s\d]+)/i);
     if (monthMatch) return monthMatch[1];
     
     const numMatch = dateStr.match(/(?:\d{4}[\/\-])?(\d{1,2})[\/\-]\d{1,2}/);
-    if (numMatch) return numMatch[1] + '月';
+    if (numMatch) return 'Tháng ' + numMatch[1];
     
     return null;
 }
@@ -71,8 +71,8 @@ export function parseStoryDate(dateStr) {
     // Làm sạch đánh dấu thứ trong tuần do AI viết
     let cleanStr = dateStr.trim();
     
-    const aiWeekdayMatch = cleanStr.match(/\(([日一二三四五六])\)/);
-    cleanStr = cleanStr.replace(/\s*\([日一二三四五六]\)\s*/g, ' ').trim();
+    const aiWeekdayMatch = cleanStr.match(/\((Chủ nhật|Thứ Hai|Thứ Ba|Thứ Tư|Thứ Năm|Thứ Sáu|Thứ Bảy)\)/i);
+    cleanStr = cleanStr.replace(/\s*\((Chủ nhật|Thứ Hai|Thứ Ba|Thứ Tư|Thứ Năm|Thứ Sáu|Thứ Bảy)\)\s*/gi, ' ').trim();
     
     // Ngày tháng không hợp lệ xử lý theo lịch giả tưởng
     if (/[xX]{2}|[?？]{2}/.test(cleanStr)) {
@@ -103,13 +103,22 @@ export function parseStoryDate(dateStr) {
         }
     }
     
-    // Định dạng Năm X Tháng M Ngày D
+    // Định dạng Năm X Tháng M Ngày D (Bao gồm cả cách viết Ngày D Tháng M Năm X)
     // Cái này phải nằm trước Tháng X Ngày X thuần túy, nếu không sẽ mất năm
-    const yearCnMatch = cleanStr.match(/(\d+)年\s*(\d{1,2})月(\d{1,2})日?/);
+    const yearCnMatch = cleanStr.match(/Năm (\d+)\s*tháng (\d{1,2})\s*ngày (\d{1,2})?/i) || cleanStr.match(/Ngày (\d{1,2})\s*tháng (\d{1,2})\s*năm (\d+)/i) || cleanStr.match(/(\d+)\s*năm\s*(\d{1,2})\s*tháng\s*(\d{1,2})\s*ngày?/i);
     if (yearCnMatch) {
-        const year = parseInt(yearCnMatch[1]);
-        const month = parseInt(yearCnMatch[2]);
-        const day = parseInt(yearCnMatch[3]);
+        let year, month, day;
+        // Phân loại tùy theo cách khớp Ngày/Tháng/Năm
+        if (yearCnMatch[0].toLowerCase().includes('ngày') && yearCnMatch[0].toLowerCase().indexOf('ngày') < yearCnMatch[0].toLowerCase().indexOf('năm')) {
+            day = parseInt(yearCnMatch[1]);
+            month = parseInt(yearCnMatch[2]);
+            year = parseInt(yearCnMatch[3]);
+        } else {
+            year = parseInt(yearCnMatch[1]);
+            month = parseInt(yearCnMatch[2]);
+            day = parseInt(yearCnMatch[3]);
+        }
+
         if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
             // Trích xuất tiền tố lịch pháp
             const fullMatchStr = yearCnMatch[0];
@@ -120,10 +129,17 @@ export function parseStoryDate(dateStr) {
     }
     
     // Định dạng Tháng X Ngày X
-    const cnMatch = cleanStr.match(/(\d{1,2})月(\d{1,2})日?/);
+    const cnMatch = cleanStr.match(/Tháng (\d{1,2})\s*ngày (\d{1,2})?/i) || cleanStr.match(/Ngày (\d{1,2})\s*tháng (\d{1,2})?/i) || cleanStr.match(/(\d{1,2})\s*tháng\s*(\d{1,2})\s*ngày?/i);
     if (cnMatch) {
-        const month = parseInt(cnMatch[1]);
-        const day = parseInt(cnMatch[2]);
+        let month, day;
+        if (cnMatch[0].toLowerCase().includes('ngày') && cnMatch[0].toLowerCase().indexOf('ngày') < cnMatch[0].toLowerCase().indexOf('tháng')) {
+            day = parseInt(cnMatch[1]);
+            month = parseInt(cnMatch[2]);
+        } else {
+            month = parseInt(cnMatch[1]);
+            day = parseInt(cnMatch[2]);
+        }
+
         if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
             return { month, day, type: 'standard' };
         }
@@ -153,7 +169,7 @@ export function calculateRelativeTime(fromDate, toDate) {
     // Bỏ đi phần thời gian ở đuôi (như "15:00" / "Buổi chiều" / "Giờ Dậu"), giữ lại ngày tháng đầy đủ để so sánh
     const stripTime = (s) => s.trim()
         .replace(/\s+\d{1,2}[:：]\d{2}.*$/, '')
-        .replace(/\s+(凌晨|早上|上午|中午|下午|傍晚|晚上|深夜|子时|丑时|寅时|卯时|辰时|巳时|午时|未时|申时|酉时|戌时|亥时).*$/i, '')
+        .replace(/\s+(Rạng sáng|Buổi sáng|Sáng|Buổi trưa|Buổi chiều|Chạng vạng|Buổi tối|Đêm khuya|Giờ Tý|Giờ Sửu|Giờ Dần|Giờ Mão|Giờ Thìn|Giờ Tỵ|Giờ Ngọ|Giờ Mùi|Giờ Thân|Giờ Dậu|Giờ Tuất|Giờ Hợi).*$/i, '')
         .trim();
     const fromDateOnly = stripTime(fromDate);
     const toDateOnly = stripTime(toDate);
@@ -194,7 +210,7 @@ export function calculateRelativeTime(fromDate, toDate) {
             return toDay - fromDay;
         }
         
-        // Khác tháng: Logic cũ dùng độ lớn của "Ngày" để đoán trước sau, trên lịch giả tưởng/phương Tây rất dễ đoán sai (ví dụ Ngày 3 tháng Sương vs Ngày 25 tháng Hỏa)
+        // Khác tháng: Logic cũ dùng độ lớn của "Ngày" để đoán trước sau, trên lịch giả tưởng/phương Tây rất dễ đoán sai
         if (fromDay !== null && toDay !== null) {
             if (fromMonth && toMonth && fromMonth !== toMonth) {
                 return null;
@@ -425,9 +441,9 @@ export function subtractDays(dateStr, days) {
 
 /** 12 Địa Chi → Giờ bắt đầu (Sơ = giờ đầu, Chính = giờ sau) */
 const EARTHLY_BRANCH_HOURS = {
-    '子': 23, '丑': 1, '寅': 3, '卯': 5,
-    '辰': 7, '巳': 9, '午': 11, '未': 13,
-    '申': 15, '酉': 17, '戌': 19, '亥': 21
+    'Tý': 23, 'Sửu': 1, 'Dần': 3, 'Mão': 5,
+    'Thìn': 7, 'Tỵ': 9, 'Ngọ': 11, 'Mùi': 13,
+    'Thân': 15, 'Dậu': 17, 'Tuất': 19, 'Hợi': 21
 };
 
 /** Lấy mô tả khoảng thời gian */
@@ -441,29 +457,18 @@ export function getTimeOfDay(timeStr) {
         hour = parseInt(match24[1]);
     }
     
-    const matchCN = timeStr.match(/(凌晨|早上|上午|中午|下午|傍晚|晚上|深夜)/);
+    const matchCN = timeStr.match(/(Rạng sáng|Buổi sáng|Sáng|Buổi trưa|Buổi chiều|Chạng vạng|Buổi tối|Đêm khuya)/i);
     if (matchCN) {
-        // Ánh xạ lại thành tiếng Việt
-        const map = {
-            '凌晨': 'Rạng sáng',
-            '早上': 'Buổi sáng',
-            '上午': 'Sáng',
-            '中午': 'Buổi trưa',
-            '下午': 'Buổi chiều',
-            '傍晚': 'Chạng vạng',
-            '晚上': 'Buổi tối',
-            '深夜': 'Đêm khuya'
-        };
-        return map[matchCN[1]] || matchCN[1];
+        return matchCN[1];
     }
     
     // 12 Địa chi dự phòng (Tý Sửu Dần Mão Thìn Tỵ Ngọ Mùi Thân Dậu Tuất Hợi + tùy chọn "giờ"/"sơ"/"chính")
     if (hour === null) {
-        const branchMatch = timeStr.match(/([子丑寅卯辰巳午未申酉戌亥])时?(?:初|正)?/);
+        const branchMatch = timeStr.match(/(Tý|Sửu|Dần|Mão|Thìn|Tỵ|Ngọ|Mùi|Thân|Dậu|Tuất|Hợi)\s*(?:giờ)?\s*(?:sơ|chính)?/i);
         if (branchMatch) {
-            const base = EARTHLY_BRANCH_HOURS[branchMatch[0].charAt(0)];
+            const base = EARTHLY_BRANCH_HOURS[branchMatch[1]];
             if (base !== undefined) {
-                hour = /正/.test(branchMatch[0]) ? (base + 1) % 24 : base;
+                hour = /chính/i.test(branchMatch[0]) ? (base + 1) % 24 : base;
             }
         }
     }
